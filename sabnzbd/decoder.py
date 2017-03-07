@@ -23,7 +23,7 @@ import Queue
 import binascii
 import logging
 import re
-from time import sleep
+from time import sleep, time
 from threading import Thread
 
 import sabnzbd
@@ -139,6 +139,9 @@ class Decoder(Thread):
                 except CrcError, e:
                     logme = T('CRC Error in %s (%s -> %s)') % (art_id, e.needcrc, e.gotcrc)
                     logging.info(logme)
+                    import cPickle
+                    with open('crc_%s' % time(), 'wb') as pickle_file:
+                        cPickle.dump([raw_data, article.bytes], pickle_file)
 
                     data = e.data
 
@@ -177,6 +180,9 @@ class Decoder(Thread):
                         if new_server_found:
                             register = False
                             logme = None
+                    import cPickle
+                    with open('yenc_%s' % time(), 'wb') as pickle_file:
+                        cPickle.dump([raw_data, article.bytes], pickle_file)
 
                 except:
                     logme = T('Unknown Error while decoding %s') % art_id
@@ -186,6 +192,9 @@ class Decoder(Thread):
                     if new_server_found:
                         register = False
                         logme = None
+                    import cPickle
+                    with open('unknown_%s' % time(), 'wb') as pickle_file:
+                        cPickle.dump([raw_data, article.bytes], pickle_file)
 
                 if logme:
                     if killed:
